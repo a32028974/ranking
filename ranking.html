@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Ranking & Filtros – Óptica Cristal</title>
+  <link rel="stylesheet" href="css/ranking.css">
+</head>
+<body>
+  <main class="wrap">
+    <header class="title">
+      <h1>Ranking y Filtros de Ventas</h1>
+      <p class="muted">Hoja: <b>Stock</b> — Filtra por fechas, vendedor, marca, fábrica, modelo y ordená.</p>
+    </header>
+
+    <!-- FILTROS -->
+    <section class="card">
+      <div class="grid">
+        <div>
+          <label>Desde (venta)</label><input type="date" id="desde">
+        </div>
+        <div>
+          <label>Hasta (venta)</label><input type="date" id="hasta">
+        </div>
+        <div>
+          <label>Desde (ingreso)</label><input type="date" id="desdeIngreso">
+        </div>
+        <div>
+          <label>Hasta (ingreso)</label><input type="date" id="hastaIngreso">
+        </div>
+        <div>
+          <label>Vendedor</label><input id="vendedor" placeholder="RODRI | CARLA | LUCAS">
+        </div>
+        <div>
+          <label>Marca</label><input id="marca" placeholder="RAYBAN | RUSTY">
+        </div>
+        <div>
+          <label>Fábrica</label><input id="fabrica" placeholder="SEBASTIAN VEDROVIK | R&D ...">
+        </div>
+        <div>
+          <label>Buscar en MODELO</label><input id="q" placeholder="Texto en modelo">
+        </div>
+        <div>
+          <label>Ordenar por</label>
+          <select id="orderBy">
+            <option value="venta">Fecha de venta</option>
+            <option value="ingreso">Fecha de ingreso</option>
+            <option value="precio">Precio</option>
+            <option value="marca">Marca</option>
+            <option value="vendedor">Vendedor</option>
+            <option value="modelo">Modelo</option>
+            <option value="fabrica">Fábrica</option>
+          </select>
+        </div>
+        <div>
+          <label>Dirección</label>
+          <select id="order">
+            <option value="desc">Desc</option>
+            <option value="asc">Asc</option>
+          </select>
+        </div>
+      </div>
+      <div class="actions">
+        <button id="btnConsultar">Consultar</button>
+        <button id="btnCSV">Exportar CSV</button>
+      </div>
+      <div class="summary" id="summary"></div>
+    </section>
+
+    <!-- RANKINGS -->
+    <section class="cols">
+      <div class="card">
+        <h3>🏆 Ranking de Vendedores (filtro aplicado)</h3>
+        <ul id="rkVend"></ul>
+      </div>
+      <div class="card">
+        <h3>🏷️ Ranking de Marcas (filtro aplicado)</h3>
+        <ul id="rkMarca"></ul>
+      </div>
+    </section>
+
+    <!-- TABLA -->
+    <section class="card">
+      <h3>Resultados</h3>
+      <div class="table-wrap">
+        <table id="tabla">
+          <thead>
+            <tr>
+              <th>N°</th><th>Marca</th><th>Modelo</th><th>Armazón</th><th>Calibre</th>
+              <th>Cristal</th><th>Familia</th><th>Precio</th>
+              <th>Fecha Ingreso</th><th>Fecha Venta</th><th>Vendedor</th><th>Fábrica</th>
+            </tr>
+          </thead>
+          <tbody id="tb"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // pegá acá tu URL pública (ideal: googleusercontent.com)
+    const API_URL = "https://script.google.com/macros/s/AKfycbzCtFkWM15vJjADC1njxXIZMA_oVC33BiGxddmzv0P4oKUO_u-J4q1472oWwl4KAq77/exec";
+  </script>
+  <script src="js/ranking.js"></script>
+</body>
+</html>
