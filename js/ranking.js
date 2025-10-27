@@ -1,3 +1,5 @@
+// /js/ranking.js — v1 JSONP fallback
+
 function toArgDate(d){ // Date -> dd/mm/aaaa
   if(!d) return '';
   const dd = String(d.getDate()).padStart(2,'0');
@@ -7,9 +9,22 @@ function toArgDate(d){ // Date -> dd/mm/aaaa
 }
 function esc(s){ return (s??'').toString().replace(/[&<>"']/g, m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m])); }
 
+// Utilidad JSONP (sin CORS)
+function jsonp(baseUrl){
+  return new Promise((resolve, reject)=>{
+    const cbName = 'jsonp_cb_' + Math.random().toString(36).slice(2);
+    window[cbName] = (data)=>{ resolve(data); cleanup(); };
+    const s = document.createElement('script');
+    const sep = baseUrl.includes('?') ? '&' : '?';
+    s.src = `${baseUrl}${sep}callback=${cbName}`;
+    s.onerror = ()=>{ reject(new Error('JSONP error')); cleanup(); };
+    document.body.appendChild(s);
+    function cleanup(){ try{ delete window[cbName]; }catch(_){} s.remove(); }
+  });
+}
+
 async function consultar(){
   const p = new URLSearchParams();
-
   p.set('action','ventas');
 
   // fechas venta
@@ -26,18 +41,31 @@ async function consultar(){
 
   // texto multi (pipe o coma)
   ['vendedor','marca','fabrica','q','orderBy','order'].forEach(id=>{
-    const v = document.getElementById(id).value.trim();
+    const el = document.getElementById(id);
+    if (!el) return;
+    const v = el.value.trim();
     if (v) p.set(id, v);
   });
 
   const url = `${API_URL}?${p.toString()}`;
-  const r = await fetch(url, { method:'GET', credentials:'omit' });
-  const data = await r.json();
-  if(!data.ok){ alert(data.error||'Error'); return; }
 
-  renderResumen(data);
-  renderRankings(data);
-  renderTabla(data.rows || []);
+  // 1) Intento fetch normal; 2) si falla (CORS) → JSONP
+  try {
+    const r = await fetch(url, { method:'GET', credentials:'omit' });
+    // Si el servidor redirige a login, esto puede lanzar
+    const data = await r.json();
+    if(!data.ok) throw new Error(data.error || 'Error');
+    renderResumen(data);
+    renderRankings(data);
+    renderTabla(data.rows || []);
+  } catch (_) {
+    // Fallback sin CORS
+    const data = await jsonp(url);
+    if(!data?.ok){ alert(data?.error || 'Error'); return; }
+    renderResumen(data);
+    renderRankings(data);
+    renderTabla(data.rows || []);
+  }
 }
 
 function renderResumen(data){
@@ -116,5 +144,5 @@ document.getElementById('btnCSV').addEventListener('click', ()=>{
   URL.revokeObjectURL(a.href);
 });
 
-// primer render vacío
+// primer render
 consultar();
